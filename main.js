@@ -18,11 +18,11 @@ function createWindow() {
 
   mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||
-      url.format({
-        pathname: path.join(__dirname, 'frontend/build/index.html'),
-        protocol: 'file:',
-        slashes: true,
-      })
+    url.format({
+      pathname: path.join(__dirname, 'frontend/build/index.html'),
+      protocol: 'file:',
+      slashes: true,
+    })
   );
 
   mainWindow.on('closed', function () {
@@ -52,11 +52,15 @@ app.on('ready', () => {
 });
 
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
 
 app.on('activate', function () {
-  if (mainWindow === null) createWindow();
+  if (mainWindow === null) {
+    createWindow();
+  }
 });
 
 app.on('will-quit', () => {
