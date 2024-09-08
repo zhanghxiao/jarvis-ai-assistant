@@ -1,0 +1,17 @@
+{
+  "name": "jarvis-ai-assistant",
+  "version": "1.0.0",
+  "description": "An AI-powered desktop assistant",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"cd frontend && npm start\" \"python backend/server.py\" \"electron .\""
+  },
+  "dependencies": {
+    "electron": "^13.1.7",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.0"
+  }
+}
