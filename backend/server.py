@@ -8,13 +8,13 @@ from openai import OpenAI
 from duckduckgo_search import DDGS
 import pyautogui
 import webbrowser
-import speech_recognition as sr
 
 app = Flask(__name__)
 CORS(app)
 
 API_KEY = os.getenv("OPENAI_API_KEY")
 BASE_URL = os.getenv("OPENAI_BASE_URL")
+SPEECH_TO_TEXT_URL = os.getenv("SPEECH_TO_TEXT_URL", "http://localhost:9000/asr")  # 新增的语音识别 URL
 client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
 FUNCTIONS = [
@@ -168,17 +168,15 @@ def transcribe_audio():
         return jsonify({"error": "Missing audio file"}), 400
     
     audio_file = request.files['file']
-    recognizer = sr.Recognizer()
     
     try:
-        with sr.AudioFile(audio_file) as source:
-            audio_data = recognizer.record(source)
-            text = recognizer.recognize_google(audio_data)
+        files = {'audio_file': (audio_file.filename, audio_file, 'audio/mpeg')}
+        response = requests.post(SPEECH_TO_TEXT_URL, files=files)
+        response.raise_for_status()
+        text = response.json().get('text', '')
         return jsonify({"text": text})
-    except sr.UnknownValueError:
-        return jsonify({"error": "Speech recognition could not understand audio"}), 400
-    except sr.RequestError as e:
-        return jsonify({"error": f"Could not request results from speech recognition service; {e}"}), 500
+    except requests.RequestException as e:
+        return jsonify({"error": f"Speech recognition service error: {str(e)}"}), 500
 
 @app.route('/v1/audio/speech', methods=['POST'])
 def text_to_speech():
